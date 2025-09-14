@@ -29,6 +29,34 @@ void check_type() {
     exit(1);
 }
 
+instr_t *parse_stmt() {
+    instr_t *instr = malloc(sizeof(instr_t));
+
+    if (next_token == TOKEN_ID) {
+        if (strcmp(token_buffer, "int") == 0) {
+            // Variable declaration
+            strcpy(instr->type, token_buffer);
+            read_token();
+            expect_token(TOKEN_ID);
+            strcpy(instr->dest, token_buffer);
+            read_token();
+            expect_token(TOKEN_ASSIGN);
+            read_token();
+            expect_token(TOKEN_INTLIT);
+            instr->op = OP_CONST;
+            instr->value = atoi(token_buffer);
+            read_token();
+            expect_token(TOKEN_SEMICOLON);
+            read_token();
+            instr->next = NULL;
+            return instr;
+        }
+    }
+
+    error("unknown statement", col - token_length, token_length);
+    return NULL;  // Unreachable
+}
+
 function_t *parse_function() {
     function_t *func = malloc(sizeof(function_t));
     // Type
@@ -52,6 +80,14 @@ function_t *parse_function() {
     // Body (currently ignored)
     expect_token(TOKEN_LBRACE);
     read_token();
+    func->instrs = NULL;
+    instr_t **pprev = &func->instrs;
+    while (next_token != TOKEN_RBRACE) {
+        instr_t *instr = parse_stmt();
+        *pprev = instr;
+        while (instr->next) instr = instr->next;
+        pprev = &instr->next;
+    }
     expect_token(TOKEN_RBRACE);
     read_token();
 

@@ -7,8 +7,11 @@
 #include "error.h"
 
 char *token_name[] = {
-    [TOKEN_EOF] = "EOF",    [TOKEN_ID] = "ID",      [TOKEN_LPAREN] = "'('",
-    [TOKEN_RPAREN] = "')'", [TOKEN_LBRACE] = "'{'", [TOKEN_RBRACE] = "'}'",
+    [TOKEN_EOF] = "EOF",       [TOKEN_ID] = "ID",
+    [TOKEN_LPAREN] = "'('",    [TOKEN_RPAREN] = "')'",
+    [TOKEN_LBRACE] = "'{'",    [TOKEN_RBRACE] = "'}'",
+    [TOKEN_ASSIGN] = "'='",    [TOKEN_INTLIT] = "INTLIT",
+    [TOKEN_SEMICOLON] = "';'",
 };
 
 extern int row;
@@ -40,28 +43,50 @@ static token_t _lex_token() {
         return TOKEN_ID;
     }
 
-    if (next_char == '(') {
+    if (isdigit(next_char)) {
+        token_buffer[token_length++] = next_char;
         read_char();
+        while (isdigit(next_char)) {
+            token_buffer[token_length++] = next_char;
+            read_char();
+        }
+        return TOKEN_INTLIT;
+    }
+
+    if (next_char == '(') {
         token_buffer[token_length++] = '(';
+        read_char();
         return TOKEN_LPAREN;
     }
 
     if (next_char == ')') {
-        read_char();
         token_buffer[token_length++] = ')';
+        read_char();
         return TOKEN_RPAREN;
     }
 
     if (next_char == '{') {
-        read_char();
         token_buffer[token_length++] = '{';
+        read_char();
         return TOKEN_LBRACE;
     }
 
     if (next_char == '}') {
-        read_char();
         token_buffer[token_length++] = '}';
+        read_char();
         return TOKEN_RBRACE;
+    }
+
+    if (next_char == '=') {
+        token_buffer[token_length++] = '=';
+        read_char();
+        return TOKEN_ASSIGN;
+    }
+
+    if (next_char == ';') {
+        token_buffer[token_length++] = ';';
+        read_char();
+        return TOKEN_SEMICOLON;
     }
 
     char buf[64];

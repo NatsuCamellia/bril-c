@@ -10,6 +10,9 @@ typedef enum {
     TOKEN_RPAREN,
     TOKEN_LBRACE,
     TOKEN_RBRACE,
+    TOKEN_ASSIGN,
+    TOKEN_INTLIT,
+    TOKEN_SEMICOLON,
 } token_t;
 
 extern char *token_name[];

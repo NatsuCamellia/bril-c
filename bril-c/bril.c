@@ -1,6 +1,6 @@
-#include <stdio.h>
-
 #include "bril.h"
+
+#include <stdio.h>
 
 void emit_function(function_t *func) {
     // Function name
@@ -11,7 +11,15 @@ void emit_function(function_t *func) {
         printf(": %s", func->type);
     }
     printf(" {\n");
-    // Function body (currently empty)
+    // Function body
+    instr_t *instr = func->instrs;
+    while (instr) {
+        if (instr->op == OP_CONST) {
+            printf("  %s: %s = const %d;\n", instr->dest, instr->type,
+                   instr->value);
+        }
+        instr = instr->next;
+    }
     printf("}\n");
 }
 
