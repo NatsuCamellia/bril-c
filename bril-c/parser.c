@@ -1,29 +1,30 @@
+#include "parser.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "bril.h"
-#include "lexer.h"
-#include "parser.h"
 #include "error.h"
+#include "lexer.h"
 
 token_t next_token;
 
-void read_token() {
-    next_token = lex_token();
-}
+void read_token() { next_token = lex_token(); }
 
 void expect_token(token_t expected) {
     if (next_token != expected) {
         char buf[256];
-        snprintf(buf, sizeof(buf), "expected token %d, got %d", expected, next_token);
+        snprintf(buf, sizeof(buf),
+                 "expected token " COLOR_BRIGHT "%s" COLOR_RESET
+                 ", got " COLOR_BRIGHT "%s" COLOR_RESET,
+                 token_name[expected], token_name[next_token]);
         error(buf, col - token_length, token_length);
     }
 }
 
 void check_type() {
-    if (strcmp(token_buffer, "int") == 0)
-        return;
+    if (strcmp(token_buffer, "int") == 0) return;
     fprintf(stderr, "Unknown type: %s\n", token_buffer);
     exit(1);
 }

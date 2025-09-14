@@ -12,6 +12,8 @@ typedef enum {
     TOKEN_RBRACE,
 } token_t;
 
+extern char *token_name[];
+
 typedef struct token_info {
     token_t type;
     char lexeme[MAX_TOKEN_LENGTH];
@@ -23,4 +25,4 @@ extern int token_length;
 void init_lexer();
 token_t lex_token();
 
-#endif // LEXER_H
+#endif  // LEXER_H

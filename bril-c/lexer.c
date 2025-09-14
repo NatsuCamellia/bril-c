@@ -1,9 +1,15 @@
-#include <stdio.h>
+#include "lexer.h"
+
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "lexer.h"
 #include "error.h"
+
+char *token_name[] = {
+    [TOKEN_EOF] = "EOF",    [TOKEN_ID] = "ID",      [TOKEN_LPAREN] = "'('",
+    [TOKEN_RPAREN] = "')'", [TOKEN_LBRACE] = "'{'", [TOKEN_RBRACE] = "'}'",
+};
 
 extern int row;
 extern int col;
@@ -22,8 +28,7 @@ void read_char() {
 }
 
 static token_t _lex_token() {
-    if (next_char == EOF)
-        return TOKEN_EOF;
+    if (next_char == EOF) return TOKEN_EOF;
 
     if (isalpha(next_char) || next_char == '_') {
         token_buffer[token_length++] = next_char;
@@ -60,19 +65,20 @@ static token_t _lex_token() {
     }
 
     char buf[64];
-    snprintf(buf, sizeof(buf), "unknown start of token: " COLOR_BRIGHT "'%c'" COLOR_RESET, next_char);
+    snprintf(buf, sizeof(buf),
+             "unknown start of token: " COLOR_BRIGHT "'%c'" COLOR_RESET,
+             next_char);
     error(buf, col, 1);
-    return TOKEN_EOF; // Unreachable
+    return TOKEN_EOF;  // Unreachable
 }
 
 token_t lex_token() {
     // Clear buffer
     token_length = 0;
     token_buffer[0] = 0;
-    while (isspace(next_char))
-        read_char();
+    while (isspace(next_char)) read_char();
     token_t token = _lex_token();
-    token_buffer[token_length] = 0; // Null-terminate the string
+    token_buffer[token_length] = 0;  // Null-terminate the string
     return token;
 }
 
