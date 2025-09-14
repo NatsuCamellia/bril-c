@@ -13,10 +13,22 @@ char line_buffer[LINE_BUFFER_SIZE];
 void error(const char *msg, int start_col, int len) {
     fprintf(stderr, COLOR_BRIGHT "stdin:%d:%d: " COLOR_RED "error: " COLOR_RESET "%s\n", row, start_col, msg);
 
-    start_col -= 1; // Convert to 0-based index
-    // Get the whole line, including '\n'
-    fgets(line_buffer + col, LINE_BUFFER_SIZE - col, stdin);
+    // Get the whole line
+    if (line_buffer[col - 1] != '\n' && line_buffer[col - 1] != EOF) {
+        while (1) {
+            int c = getchar();
+            if (c == EOF || c == '\n') break;
+            if (col < LINE_BUFFER_SIZE - 1)
+                line_buffer[col++] = (char)c;
+            else
+                break;
+        }
+    }
+    if (line_buffer[col - 1] == EOF)
+        col--;
+    line_buffer[col] = '\0';
 
+    start_col -= 1; // Convert to 0-based index
     // Highlight the error position
     char new_buffer[LINE_BUFFER_SIZE];
     int i = 0;
@@ -30,7 +42,7 @@ void error(const char *msg, int start_col, int len) {
     ptr = stpcpy(ptr, line_buffer + start_col + len);
 
 
-    fprintf(stderr, "%5d | %s", row, new_buffer);
+    fprintf(stderr, "%5d | %s\n", row, new_buffer);
     fprintf(stderr, "      | ");
     for (i = 0; i < start_col; i++)
         fprintf(stderr, " ");
